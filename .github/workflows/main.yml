@@ -10,7 +10,7 @@ secure-rdp:
 runs-on: windows-latest
 timeout-minutes: 350
 
-```
+
 steps:
   - name: Configure Core RDP Settings
     run: |
@@ -99,4 +99,4 @@ steps:
       while ($true) {
         Start-Sleep -Seconds 300
       }
-```
+
