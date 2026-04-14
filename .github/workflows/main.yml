@@ -10,18 +10,20 @@ secure-rdp:
 runs-on: windows-latest
 timeout-minutes: 350
 
+```
 steps:
   - name: Configure Core RDP Settings
     run: |
       Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0 -Force
       Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 0 -Force
       Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "SecurityLayer" -Value 0 -Force
+
       netsh advfirewall firewall delete rule name="RDP-Tailscale"
       netsh advfirewall firewall add rule name="RDP-Tailscale" dir=in action=allow protocol=TCP localport=3389
 
       Restart-Service -Name TermService -Force
 
-  - name: Create RDP User
+  - name: Create RDP User with Fixed Password
     run: |
       $password = "zezo1232"
       $securePass = ConvertTo-SecureString $password -AsPlainText -Force
@@ -106,7 +108,8 @@ steps:
                   Write-Host "Error: $($_.Exception.Message)"
                   break
               }
-          } else {
+          }
+          else {
               Start-Sleep -Seconds 30
           }
       }
@@ -115,4 +118,4 @@ steps:
           Write-Host "[$(Get-Date)] RDP Active"
           Start-Sleep -Seconds 300
       }
-
+```
