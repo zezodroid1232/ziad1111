@@ -14,12 +14,9 @@ timeout-minutes: 350
 steps:
   - name: Configure Core RDP Settings
     run: |
-      Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' `
-                         -Name "fDenyTSConnections" -Value 0 -Force
-      Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
-                         -Name "UserAuthentication" -Value 0 -Force
-      Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
-                         -Name "SecurityLayer" -Value 0 -Force
+      Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0 -Force
+      Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 0 -Force
+      Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "SecurityLayer" -Value 0 -Force
 
       netsh advfirewall firewall delete rule name="RDP-Tailscale"
       netsh advfirewall firewall add rule name="RDP-Tailscale" dir=in action=allow protocol=TCP localport=3389
@@ -46,14 +43,12 @@ steps:
       $installerPath = "$env:TEMP\tailscale.msi"
 
       Invoke-WebRequest -Uri $tsUrl -OutFile $installerPath
-      Start-Process msiexec.exe -ArgumentList "/i", "`"$installerPath`"", "/quiet", "/norestart" -Wait
+      Start-Process msiexec.exe -ArgumentList "/i `"$installerPath`" /quiet /norestart" -Wait
       Remove-Item $installerPath -Force
 
   - name: Establish Tailscale Connection
     run: |
-      & "$env:ProgramFiles\Tailscale\tailscale.exe" up `
-        --authkey=${{ secrets.TAILSCALE_AUTHKEY }} `
-        --hostname=ziad-rdp
+      & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=${{ secrets.TAILSCALE_AUTHKEY }} --hostname=ziad-rdp
 
       $tsIP = $null
       $retries = 0
@@ -113,8 +108,7 @@ steps:
                   Write-Host "Error: $($_.Exception.Message)"
                   break
               }
-          }
-          else {
+          } else {
               Start-Sleep -Seconds 30
           }
       }
